@@ -39,14 +39,21 @@ namespace Bilibili_wing
             {
                 throw new ArgumentException("Can not get the video download link. Please try again!");
             }
-            return "";
+            return downloadLink;
         }
 
-        private static void AddHeader(HttpClient client)
+        public static void AddHeader(HttpClient client)
         {
             client.DefaultRequestHeaders.Add("Accept", "text/html");
             client.DefaultRequestHeaders.Add("User-Agent", "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.124 Safari/537.36");
             client.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,ja;q=0.4");
+        }
+
+        public static void AddHeader(WebClient client)
+        {
+            client.Headers.Add("Accept", "text/html");
+            client.Headers.Add("User-Agent", "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.124 Safari/537.36");
+            client.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,ja;q=0.4");
         }
     }
 }
