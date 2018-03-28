@@ -18,10 +18,14 @@ namespace Bilibili_wing
 
         private WebClient _client = new WebClient();
 
-        private bool _isRunning = false;
         public bool IsRunning
         {
-            get { return _isRunning; }
+            get
+            {
+                if (_client == null)
+                    return false;
+                return _client.IsBusy;
+            }
         }
 
         private bool _requestStop = false;
@@ -37,19 +41,17 @@ namespace Bilibili_wing
             Url = url;
         }
 
-        public async void Start(string filePath)
+        public void Start(string filePath)
         {
-            _isRunning = true;
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             System.Console.WriteLine("try to open " + Url);
-            _client.DownloadFileAsync(new Uri(Url),filePath);
-            _isRunning = false;
+            _client.DownloadFileAsync(new Uri(Url), filePath);
         }
 
         public void Stop()
         {
-            _requestStop = false;
+            _client.CancelAsync();
         }
     }
 }
