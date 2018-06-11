@@ -43,7 +43,7 @@ namespace Bilibili_wing
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             System.Console.WriteLine("try to open " + Url);
-            _client.DownloadFileAsync(new Uri(Url),filePath);
+            await _client.DownloadFileTaskAsync(new Uri(Url),filePath);
             _isRunning = false;
         }
 

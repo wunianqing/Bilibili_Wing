@@ -2,6 +2,7 @@
 using System.Net;
 using System.Linq;
 using System.Collections.Generic;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace Bilibili_wing
 {
@@ -9,29 +10,65 @@ namespace Bilibili_wing
     {
         static void Main(string[] args)
         {
-            while(true)
+            while (true)
             {
                 System.Console.WriteLine("Please enter command");
                 var cmd = Console.ReadLine();
-                var cmds = cmd.Split(' ').Select(c=>c.Trim().ToLower()).ToArray();
-                if(cmds[0] == "start")
+                var cmds = cmd.Split(' ').Select(c => c.Trim().ToLower()).ToArray();
+
+                var app = new CommandLineApplication();
+                app.HelpOption();
+                var startLive = app.Option("-s|--start <RoomID>", "The RoomID", CommandOptionType.SingleValue);
+                var statusLive = app.Option("-st|--status", "List all downloading lives", CommandOptionType.NoValue);
+                var stopLive = app.Option("-p|--stop <RoomID>", "Stop the specified live", CommandOptionType.SingleValue);
+                var exitApp = app.Option("-e|--exit","exit application",CommandOptionType.NoValue);
+                app.OnExecute(() =>
                 {
-                    System.Console.WriteLine($"Start live {cmds[1]}");
-                    var live = new BiliBiliLive(int.Parse(cmds[1]));
-                    StartLive(live);
-                    _lives.Add(live);
-                }
-                else if(cmds[0] == "status")
-                {
-                    foreach(var live in _lives)
+                    if (startLive.HasValue())
                     {
-                        System.Console.WriteLine($"roomId={live.RoomId}\tdownloading={live.IsRunning}");
+                        int roomId;
+                        if (int.TryParse(startLive.Value(), out roomId))
+                        {
+                            var live = new BiliBiliLive(roomId);
+                            StartLive(live);
+                            _lives.Add(live);
+                        }
+                        else
+                        {
+                            Console.WriteLine("RoomID has to be a int");
+                        }
                     }
-                }
-                else if(cmds[0] == "stop")
-                {
-                    _lives.Where(l=>l.RoomId == int.Parse(cmds[1])).FirstOrDefault().Stop();
-                }
+                    else if (statusLive.HasValue())
+                    {
+                        foreach (var live in _lives)
+                        {
+                            System.Console.WriteLine($"roomId={live.RoomId}\tdownloading={live.IsRunning}");
+                        }
+                    }
+                    else if (stopLive.HasValue())
+                    {
+                        int roomId;
+                        if (int.TryParse(stopLive.Value(), out roomId))
+                        {
+                            var live = _lives.FirstOrDefault(l => l.RoomId == roomId);
+                            if (live == null)
+                            {
+                                Console.WriteLine("No such live is downloading, please check and try again");
+                                return;
+                            }
+                            live.Stop();
+                        }
+                        else
+                        {
+                            Console.WriteLine("RoomID has to be a int");
+                        }
+                    }
+                    else if(exitApp.HasValue())
+                    {
+                        Environment.Exit(0);
+                    }
+                });
+                app.Execute(cmds);
             }
         }
 
@@ -39,9 +76,9 @@ namespace Bilibili_wing
 
         static void StartLive(BiliBiliLive live)
         {
-            while(!live.IsAvailed)
+            while (!live.IsAvailed)
                 ;
             live.Start();
-        } 
+        }
     }
 }
