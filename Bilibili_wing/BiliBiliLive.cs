@@ -63,13 +63,21 @@ namespace Bilibili_wing
         {
             if (_download != null) return;
             _download = new Downloader(DownloadLink);
-            _download.Start($"{Directory.GetCurrentDirectory()}\\{RoomId}\\{DateTime.Now.ToString("yyMMdd")}.flv");
+            var directoryPath = $"{Directory.GetCurrentDirectory()}\\{RoomId}";
+            if(!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+            _download.Start($"{directoryPath}\\{DateTime.Now.ToString("yyMMdd")}.flv");
         }
 
         public void Stop()
         {
             _download?.Stop();
             _download = null;
+        }
+
+        public override string ToString()
+        {
+            return $"Room {_roomId}\nStatus {_download.Status}";
         }
     }
 }
