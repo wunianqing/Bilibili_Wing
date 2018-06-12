@@ -59,14 +59,21 @@ namespace Bilibili_wing
             _isAvailed = true;
         }
 
-        public void Start()
+        public async void Start()
         {
             if (_download != null) return;
             _download = new Downloader(DownloadLink);
             var directoryPath = $"{Directory.GetCurrentDirectory()}\\{RoomId}";
             if(!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
-            _download.Start($"{directoryPath}\\{DateTime.Now.ToString("yyMMdd")}.flv");
+            try
+            {
+                await _download.Start($"{directoryPath}\\{DateTime.Now.ToString("yyMMdd")}.flv");
+            }
+            catch
+            {
+                Console.WriteLine($"Live {RoomId} finished.");
+            }
         }
 
         public void Stop()
@@ -77,7 +84,7 @@ namespace Bilibili_wing
 
         public override string ToString()
         {
-            return $"Room {_roomId}\nStatus {_download.Status}";
+            return $"Room {_roomId} has download {_download.DownloadSize}";
         }
     }
 }

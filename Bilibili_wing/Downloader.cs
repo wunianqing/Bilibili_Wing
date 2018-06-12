@@ -13,8 +13,7 @@ namespace Bilibili_wing
         private string _url = "";
         private WebClient _client = new WebClient();
         private bool _isRunning = false;
-        private bool _requestStop = false;
-        private string _status;
+        private string _downloadSize;
         #endregion
 
         #region Properties
@@ -28,9 +27,9 @@ namespace Bilibili_wing
             get { return _isRunning; }
         }
 
-        public string Status
+        public string DownloadSize
         {
-            get { return _status; }
+            get { return _downloadSize; }
         }
         #endregion
 
@@ -48,29 +47,26 @@ namespace Bilibili_wing
         #endregion
 
         #region Methods
-        public async void Start(string filePath)
+        public async Task Start(string filePath)
         {
             _isRunning = true;
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             System.Console.WriteLine("try to open " + Url);
             _client.DownloadProgressChanged += DownloadProgressCallback;
+
             await _client.DownloadFileTaskAsync(new Uri(Url), filePath);
             _isRunning = false;
         }
 
         private void DownloadProgressCallback(object sender, DownloadProgressChangedEventArgs e)
         {
-            _status = string.Format("{0}    downloaded {1} of {2} bytes. {3} % complete...", 
-                            (string)e.UserState, 
-                            e.BytesReceived, 
-                            e.TotalBytesToReceive,
-                            e.ProgressPercentage);
+            _downloadSize = string.Format("{0:N0} MB", e.BytesReceived / 1024 / 1024);
         }
 
         public void Stop()
         {
-            _requestStop = false;
+            _client.CancelAsync();
         }
         #endregion
     }

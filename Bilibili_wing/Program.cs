@@ -3,6 +3,7 @@ using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using McMaster.Extensions.CommandLineUtils;
+using System.Threading;
 
 namespace Bilibili_wing
 {
@@ -30,6 +31,7 @@ namespace Bilibili_wing
                         if (int.TryParse(startLive.Value(), out roomId))
                         {
                             var live = new BiliBiliLive(roomId);
+                            System.Console.WriteLine("start live");
                             StartLive(live);
                             _lives.Add(live);
                         }
@@ -42,7 +44,7 @@ namespace Bilibili_wing
                     {
                         foreach (var live in _lives)
                         {
-                            System.Console.WriteLine($"roomId={live.RoomId}\tdownloading={live.IsRunning}");
+                            System.Console.WriteLine(live);
                         }
                     }
                     else if (stopLive.HasValue())
@@ -77,7 +79,7 @@ namespace Bilibili_wing
         static void StartLive(BiliBiliLive live)
         {
             while (!live.IsAvailed)
-                ;
+                Thread.Sleep(500);
             live.Start();
         }
     }
