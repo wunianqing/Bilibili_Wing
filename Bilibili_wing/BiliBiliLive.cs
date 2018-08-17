@@ -1,8 +1,4 @@
 using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using System.IO;
 
 namespace Bilibili_wing
@@ -63,6 +59,10 @@ namespace Bilibili_wing
         {
             if (_download != null) return;
             _download = new Downloader(DownloadLink);
+            _download.DownloadCompleted += (s,e)=>
+            {
+                System.Console.WriteLine($"Download {RoomId} complated!");
+            };
             _download.Start($"{Directory.GetCurrentDirectory()}\\{RoomId}\\{DateTime.Now.ToString("yyMMdd")}.flv");
         }
 

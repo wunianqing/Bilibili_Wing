@@ -1,9 +1,7 @@
 using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using System.IO;
+using System.ComponentModel;
 
 namespace Bilibili_wing
 {
@@ -28,8 +26,6 @@ namespace Bilibili_wing
             }
         }
 
-        private bool _requestStop = false;
-
         public Downloader()
         {
             BiliHttpHelper.AddHeader(_client);
@@ -46,8 +42,19 @@ namespace Bilibili_wing
             if (!Directory.Exists(Path.GetDirectoryName(filePath)))
                 Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             System.Console.WriteLine("try to open " + Url);
+            
+            _client.DownloadFileCompleted += DownloadFileCompleted;
             _client.DownloadFileAsync(new Uri(Url), filePath);
+            
         }
+
+        private void DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            _client.DownloadFileCompleted -= DownloadFileCompleted;
+            DownloadCompleted?.Invoke(sender,e);
+        }
+
+        public AsyncCompletedEventHandler DownloadCompleted; 
 
         public void Stop()
         {
